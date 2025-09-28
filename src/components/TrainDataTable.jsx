@@ -18,7 +18,8 @@ const getDecisionInfo = (decision) => {
     }
 };
 
-const TrainRow = ({ train, decision, totalDistance }) => {
+// BUG FIX 1: The row needs to know its own index to position the tooltip correctly.
+const TrainRow = ({ train, decision, totalDistance, rowIndex }) => {
   const progress = (train.current_km / totalDistance) * 100;
   const decisionInfo = decision ? getDecisionInfo(decision.decision) : getDecisionInfo('');
   const DecisionIcon = decisionInfo.icon;
@@ -32,6 +33,9 @@ const TrainRow = ({ train, decision, totalDistance }) => {
   };
 
   const TrainIcon = train.train_type === 'freight' ? GiCargoShip : FaTrain;
+
+  // BUG FIX 1: Determine if the row is near the top of the visible table.
+  const isFirstFewRows = rowIndex < 2;
 
   return (
     <tr className="border-b border-slate-700 hover:bg-slate-800/50 transition-colors">
@@ -66,12 +70,17 @@ const TrainRow = ({ train, decision, totalDistance }) => {
         {decision ? (
           <div className="flex items-center gap-2 group relative">
             <DecisionIcon className={`text-lg ${decisionInfo.color}`} />
-            <span className={`hidden lg:inline ${decisionInfo.color}`}>{decision.decision}</span>
-            <div className="absolute bottom-full mb-2 -left-1/2 w-64 bg-slate-900 border border-slate-700 text-white text-xs rounded-lg p-3 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-xl">
+            {/* BUG FIX 2: Removed `hidden lg:inline` to make text visible on all screen sizes. */}
+            <span className={`${decisionInfo.color}`}>{decision.decision}</span>
+            
+            {/* BUG FIX 1: Dynamically position the tooltip based on the row's index. */}
+            <div className={`absolute ${isFirstFewRows ? 'top-full mt-2' : 'bottom-full mb-2'} -left-1/2 w-64 bg-slate-900 border border-slate-700 text-white text-xs rounded-lg p-3 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-xl`}>
               <p className="font-bold">Reasoning:</p>
               <p className="mb-2">{decision.reasoning}</p>
               <p>Confidence: <span className="font-semibold text-cyan-300">{(decision.confidence * 100).toFixed(0)}%</span></p>
-              <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-slate-700"></div>
+              
+              {/* BUG FIX 1: Also dynamically position the tooltip's arrow. */}
+              <div className={`absolute left-1/2 -translate-x-1/2 w-0 h-0 border-x-4 border-x-transparent ${isFirstFewRows ? 'bottom-full border-b-4 border-b-slate-700' : 'top-full border-t-4 border-t-slate-700'}`}></div>
             </div>
           </div>
         ) : (
@@ -143,11 +152,9 @@ const TrainDataTable = ({ trains, decisions, totalDistance }) => {
 
   return (
     <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl shadow-lg">
-      {/* RESPONSIVE CHANGE: Controls stack vertically on mobile (flex-col) and become a row on small screens and up (sm:flex-row) */}
       <div className="p-4 border-b border-slate-700 flex flex-col sm:flex-row justify-between items-center gap-4">
         <h2 className="text-xl font-bold text-white self-start sm:self-center">Active Train Details</h2>
         <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
-          {/* Search Input */}
           <div className="relative w-full sm:w-auto">
             <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
             <input 
@@ -158,7 +165,6 @@ const TrainDataTable = ({ trains, decisions, totalDistance }) => {
               className="bg-slate-700/50 border border-slate-600 rounded-md py-2 pl-9 pr-3 text-white focus:ring-2 focus:ring-cyan-500 focus:outline-none w-full sm:w-48"
             />
           </div>
-          {/* Filter Dropdown */}
           <div className="relative w-full sm:w-auto">
              <FaFilter className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
              <select
@@ -176,7 +182,6 @@ const TrainDataTable = ({ trains, decisions, totalDistance }) => {
         </div>
       </div>
       
-      {/* RESPONSIVE CHANGE: This div allows the table to scroll horizontally on small screens instead of breaking the layout. */}
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-slate-700">
           <thead className="bg-slate-800 sticky top-0">
@@ -190,12 +195,14 @@ const TrainDataTable = ({ trains, decisions, totalDistance }) => {
           </thead>
           <tbody className="bg-slate-800/30">
             {paginatedTrains.length > 0 ? (
-                paginatedTrains.map(train => (
+                // BUG FIX 1: Pass the row's index to the TrainRow component.
+                paginatedTrains.map((train, index) => (
                   <TrainRow
                     key={train.train_number}
                     train={train}
                     decision={decisions[train.train_number]}
                     totalDistance={totalDistance}
+                    rowIndex={index} 
                   />
                 ))
             ) : (
