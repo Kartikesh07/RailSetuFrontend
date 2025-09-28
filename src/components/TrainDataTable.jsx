@@ -143,9 +143,10 @@ const TrainDataTable = ({ trains, decisions, totalDistance }) => {
 
   return (
     <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl shadow-lg">
-      <div className="p-4 border-b border-slate-700 flex flex-col md:flex-row justify-between items-center gap-4">
-        <h2 className="text-xl font-bold text-white">Active Train Details</h2>
-        <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+      {/* RESPONSIVE CHANGE: Controls stack vertically on mobile (flex-col) and become a row on small screens and up (sm:flex-row) */}
+      <div className="p-4 border-b border-slate-700 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <h2 className="text-xl font-bold text-white self-start sm:self-center">Active Train Details</h2>
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
           {/* Search Input */}
           <div className="relative w-full sm:w-auto">
             <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
@@ -175,15 +176,16 @@ const TrainDataTable = ({ trains, decisions, totalDistance }) => {
         </div>
       </div>
       
+      {/* RESPONSIVE CHANGE: This div allows the table to scroll horizontally on small screens instead of breaking the layout. */}
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-slate-700">
           <thead className="bg-slate-800 sticky top-0">
             <tr>
-              <SortableHeader column="train_number" sortConfig={sortConfig} onSort={requestSort}>Train</SortableHeader>
-              <th scope="col" className="p-3 w-1/4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Journey Progress</th>
-              <SortableHeader column="status" sortConfig={sortConfig} onSort={requestSort}>Status</SortableHeader>
-              <SortableHeader column="delay_minutes" sortConfig={sortConfig} onSort={requestSort}>Delay</SortableHeader>
-              <th scope="col" className="p-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">AI Recommendation</th>
+              <SortableHeader column="train_number" sortConfig={sortConfig} onSort={requestSort}><span className="whitespace-nowrap">Train</span></SortableHeader>
+              <th scope="col" className="p-3 w-1/4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"><span className="whitespace-nowrap">Journey Progress</span></th>
+              <SortableHeader column="status" sortConfig={sortConfig} onSort={requestSort}><span className="whitespace-nowrap">Status</span></SortableHeader>
+              <SortableHeader column="delay_minutes" sortConfig={sortConfig} onSort={requestSort}><span className="whitespace-nowrap">Delay</span></SortableHeader>
+              <th scope="col" className="p-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"><span className="whitespace-nowrap">AI Recommendation</span></th>
             </tr>
           </thead>
           <tbody className="bg-slate-800/30">

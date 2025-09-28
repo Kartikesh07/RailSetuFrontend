@@ -30,7 +30,8 @@ const MetricCards = ({ metrics }) => {
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+    // RESPONSIVE CHANGE: Starts as 1 column, becomes 2 on small screens, 3 on medium, and 5 on large screens.
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
       {metricData.map(metric => <MetricCard key={metric.title} {...metric} />)}
     </div>
   );

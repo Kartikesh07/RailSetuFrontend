@@ -9,7 +9,7 @@ const Dashboard = ({ reportData }) => {
   const totalDistance = 455.3; // As defined in your backend
 
   return (
-    <main className="p-4 sm:p-6 lg:p-8 max-w-screen-2xl mx-auto">
+    <main className="p-4 md:p-6 max-w-screen-2xl mx-auto">
       <div className="flex flex-col gap-6">
         <Header sectionName={section} lastUpdated={timestamp} />
         <MetricCards metrics={metrics} />
